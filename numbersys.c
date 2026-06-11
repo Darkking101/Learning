@@ -7,7 +7,35 @@
 #define FALSE 0
 
 void test();
-char* decimal_to_hex (char *input_value); 
+void choice();
+int is_same(char *actual_value, char *expect_value);
+
+void input(char *input_number, int *length);
+char* input_and_decide_type(char *input_number);
+
+int is_binary(int len, char *num);
+int char_to_int(int len, char *num);
+
+int get_result(int val);
+int get_length(char *str);
+
+char* binary_to_octal(char *input_number);
+char* binary_to_decimal(int length, char *num);
+char* binary_to_hex(char *input_number);
+
+char* decimal_to_binary(int val);
+char* decimal_to_octal(char *input_value);
+char* decimal_to_hex(char *input_value);
+
+char* octal_to_binary(char *input_number);
+char* octal_to_decimal(char *input_number);
+char* octal_to_hex(char *input_number);
+
+char* single_hex_to_binary(char input);
+char* multi_hex_to_binary(char *input_value);
+char* hex_to_octal(char *input_number);
+char* hex_to_decimal(char *input_number);
+
 
 int get_result (int val) {
 
@@ -49,7 +77,6 @@ int is_same (char* actual_value, char* expect_value) {
 	return TRUE;
 }
 
-
 int is_binary (int len, char* num) {
 
 	for (int i = 0; i < len; i++) {
@@ -79,8 +106,8 @@ int char_to_int (int len, char *num) {
 void input (char* input_number, int* length) {
 
 	printf ("Enter Values : ");
-	char c;
-	while ( (c = getchar()) != '\n' && c != EOF);
+//	char c;
+//	while ( (c = getchar()) != '\n' && c != EOF && c != '\0');
 
 	fgets (
 		input_number, 
@@ -97,6 +124,98 @@ void input (char* input_number, int* length) {
 	}
 	printf ("Entered Number: %s\n", input_number);
 	printf ("length: %d\n", *length);
+}
+
+void all_right(char *input_number) {
+
+	int len = get_length(input_number);
+	printf ("Given value in binary: %s\n", input_number);
+	printf ("Given Value in Octal : %s\n", binary_to_octal(input_number));
+	printf("Given value in decimal: %s\n", binary_to_decimal(len, input_number));
+	printf("Given value in hex    : %s\n", binary_to_hex(input_number));
+	return;
+}
+
+char* binary_to_octal(char *input_number) {
+
+	int len = get_length(input_number);
+	char *result = malloc (len + 1);
+	if (len <= 1 && input_number[0] == '0') {
+		result[0] = '0';
+		return result;
+	}
+	int k = 0;
+	int i = len - 1;
+	while (i >= 0) {
+		int value = 0;
+		for (int j = 0; j < 3; j++) {
+			if(i < 0) {
+				break;
+			}
+			if(input_number[i] == '1') {
+				value += 1 << j;
+			}
+			i--;
+		}
+		result[k] = value + '0';
+		k++;
+	}
+	len = get_length(result) - 1;
+	i = 0;
+	while (i < len) {
+		char c      = result[i];
+		result[i]   = result[len];
+		result[len] = c;
+		i++;
+		len--;
+	}
+	return result;
+	
+}
+
+
+
+char* binary_to_hex(char *input_number) {
+
+	int len = get_length(input_number);
+	char *result = malloc(len + 1);
+	result[len] = '\0';
+	int k = 0;
+	int i = len - 1;
+	if(len < 1 && input_number[i] == '0') {
+		result[0] = '0';
+		return result;
+	}
+	while (i >= 0) {
+		int value = 0;
+		for(int j = 0; j < 4; j++) {
+			if (i < 0) {
+				break;
+			}
+			if(input_number[i] == '1') {
+				value += 1 << j;
+			}
+			i--;
+		}
+		if (value >= 10 && value <= 15) {
+			result[k] = value + 'A' - 10; 
+		}
+		else {
+			result[k] = value + '0';
+		}
+		k++;
+	}
+	len = get_length(result) - 1;
+	i = 0;
+	while(i < len) {
+		char x = result[i];
+		result[i] = result[len];
+		result[len] = x;
+		i++;
+		len--;
+	}
+	return result;
+	
 }
 
 char* binary_to_decimal (int len, char* num) {
@@ -130,7 +249,6 @@ char* binary_to_decimal (int len, char* num) {
 
 char* decimal_to_binary (int value) {
 
-	printf ("Input : %d\n", value);
 	char a_binary[1024] = {};
 	int count = 0;
 	if (value == 0) {
@@ -194,8 +312,9 @@ char* octal_to_binary (char *input_value) {
 		}
 		
 		x = k;
-		for (int j = 0; j < 3; j++) {
-			if (value > 0 && (value % 2 == 1)) {
+		for(int j = 0; j < 3; j++) {
+
+			if (value % 2 == 1) {
 				result[k] = '1';
 			}
 			else {
@@ -203,11 +322,16 @@ char* octal_to_binary (char *input_value) {
 			}
 			value /= 2;
 			k--;
+
 		}
 		k = x + 3;
 	}
-	return result;
-
+	
+	int i = 0;
+	while (result[i] == '0' && result[i+1] != '\0') {
+		i++;
+	}
+	return result+i;
 }
 
 char* octal_to_decimal (char *input_value) {
@@ -343,15 +467,11 @@ char* hex_to_octal (char *input_value) {
 	return result;
 
 }
-char* single_hex_to_binary (char input);
-char* multi_hex_to_binary (char *input_value);
 
-int main () {
-
+void choice () {
 	int length = 1024;
 	char input_number[1024] = {};
-	test();
-	return 0;
+
 	printf ("Choose number conversion \n"
 		"1.Decimal to Binary\n"
 		"2.Binary to Decimals\n"
@@ -360,7 +480,9 @@ int main () {
 		"5.Decimal to Octal\n"
 		"6.Decimal to Hex\n"
 		"7.Hex to Binary\n"
-		"8.Octal to Binary: "
+		"8.Octal to Binary\n"
+		"9.Hex to Decimal\n"
+		"10.Octal to Decimal:"
 	);
 
 	int choice = 0;
@@ -420,9 +542,59 @@ int main () {
 			arr = octal_to_hex (input_number);
 			printf("result: %s\n", arr);
 			break;
-	
+		default:
+			printf ("Choose from options 1 to 10\n");
+			exit (1);
 	}
+
+}
+
+
+char* input_and_decide_type(char *input_number) {
+
+	char type = 'd';
+	int len = get_length (input_number);
+	if (len > 2) {
+		if (input_number[1] == 'b' || input_number[1] == 'B') {
+			type = 'b';
+		}
+		else if (input_number[1] == 'x' || input_number[1] == 'x') {
+			type = 'x';
+		}
+		else if (input_number[0] == '0') {
+			type = 'o';
+		}	
+	}
+	char *result = malloc (len+1);
+
+	if(type == 'b') {
+		result = input_number + 2;
+	}
+	else if(type == 'o') {
+		result = octal_to_binary(input_number + 1);
+	}
+	else if(type == 'x') {
+		result = multi_hex_to_binary(input_number + 2);
+	}
+	else {
+		int value= char_to_int(1024, input_number);
+		result = decimal_to_binary(value);
+	}
+	return result;
+}
+
+int main () {
+
+	test();
+	int length = 1024;
+	char *input_number = malloc (1024);
+	input(input_number, &length);
+
+
+
+	all_right(input_and_decide_type(input_number));
 	return 0;
+
 }
 
 char* decimal_to_hex (char *input_value) {
@@ -475,288 +647,571 @@ void test () {
 	if (!is_same (binary_to_decimal(4,"1100"), "12")) {
 		printf ("1st test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 1 Passed\n");
 	}
+	
 	if (!is_same (binary_to_decimal(4,"0110"), "6")) {
 		printf ("2st test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 2 Passed\n");
 	}
 
 	if (!is_same (binary_to_decimal(1,"0"), "0")) {
 		printf ("3st test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 3 Passed\n");
 	}
-
 			
 	if (!is_same (binary_to_decimal(7,"1111011"), "123")) {
 		printf ("4st test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 4 Passed\n");
 	}
 
 	if (!is_same (binary_to_decimal(8,"11111111"), "255")) {
 		printf ("5st test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 5 Passed\n");
 	}
+	
 	if (!is_same (hex_to_decimal("1"), "1")) {
 		printf ("6th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 6 Passed\n");
 	}
-
 
 	if (!is_same (hex_to_decimal("0"), "0")) {
 		printf ("6th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 6 Passed\n");
 	}
 
 	if (!is_same (hex_to_decimal("1330"), "4912")) {
 		printf ("7th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 7 Passed\n");
 	}
 
 	if (!is_same (hex_to_decimal("32748"), "206664")) {
 		printf ("8th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 8 Passed\n");
 	}
 
 	if (!is_same (hex_to_decimal("77"), "119")) {
 		printf ("9th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 9 Passed\n");
 	}
 
 	if (!is_same (octal_to_decimal("30"), "24")) {
 		printf ("10th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 10 Passed\n");
 	}
+	
 	if (!is_same (octal_to_decimal("0"), "0")) {
 		printf ("11th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 11 Passed\n");
 	}
+	
 	if (!is_same (octal_to_decimal("1"), "1")) {
 		printf ("12th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 12 Passed\n");
 	}
+	
 	if (!is_same (octal_to_decimal("100"), "64")) {
 		printf ("13th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 13 Passed\n");
 	}
+	
 	if (!is_same (octal_to_decimal("30041"), "12321")) {
 		printf ("14th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 14 Passed\n");
 	}
+	
 	if (!is_same (octal_to_decimal("277"), "191")) {
 		printf ("14th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 14 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_octal("0"), "0")) {
 		printf ("15th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 15 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_octal("10"), "12")) {
 		printf ("16th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 16 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_octal("1"), "1")) {
 		printf ("17th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 17 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_octal("277"), "425")) {
 		printf ("18th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 18 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_hex("277"), "115")) {
 		printf ("19th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 19 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_hex("1"), "1")) {
 		printf ("19th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 19 Passed\n");
 	}
-
 
 	if (!is_same (decimal_to_hex("0"), "0")) {
 		printf ("20th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 20 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_hex("3"), "3")) {
 		printf ("21th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 21 Passed\n");
 	}
+	
 	if (!is_same (decimal_to_hex("399"), "18F")) {
 		printf ("22th test failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Test 22 Passed\n");
 	}
+	
 	if (!is_same (hex_to_octal("1"), "1")) {
 		printf ("Hex - > octal test 1 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octal test 1 passed\n");
 	}
-	if (!is_same (hex_to_octal("0"), "0")) {
+	
+	if (!is_same (hex_to_octal("0"), ("0"))) {
 		printf ("Hex - > octal test 2 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octal test 2 passed\n");
 	}
-	if (!is_same (hex_to_octal("7"), "7")) {
+	
+	if (!is_same (hex_to_octal("7"), ("7"))) {
 		printf ("Hex - > octal test 3 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octal test 3 passed\n");
 	}
-	if (!is_same (hex_to_octal("1F"), "37")) {
+	
+	if (!is_same (hex_to_octal("1F"), ("37"))) {
 		printf ("Hex -> octal test 4 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octal test 4 passed\n");
 	}
-	if (!is_same (hex_to_octal("24232"), "441062")) {
+	
+	if (!is_same (hex_to_octal("24232"), ("441062"))) {
 		printf ("Hex -> octal test 4 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octal test 4 passed\n");
 	}
 
-	if (!is_same (hex_to_octal("D"), "15")) {
+	if (!is_same (hex_to_octal("D"), ("15"))) {
 		printf ("Hex -> octal test 5 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("Hex -> octall test 5 passed\n");
 	}
 
-	if (!is_same (octal_to_hex("0"), "0")) {
+	if (!is_same (octal_to_hex("0"), ("0"))) {
 		printf ("oct -> hex test 1 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 1 passed\n");
 	}
-	if (!is_same (octal_to_hex("1"), "1")) {
+	
+	if (!is_same (octal_to_hex("1"), ("1"))) {
 		printf ("oct -> hex test 2 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 2 passed\n");
 	}
-	if (!is_same (octal_to_hex("3"), "3")) {
+	
+	if (!is_same (octal_to_hex("3"), ("3"))) {
 		printf ("oct -> hex test 3 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 3 passed\n");
 	}
 
-	if (!is_same (octal_to_hex("7"), "7")) {
+	if (!is_same (octal_to_hex("7"), ("7"))) {
 		printf ("oct -> hex test 4 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 4 passed\n");
 	}
 
-	if (!is_same (octal_to_hex("12"), "A")) {
+	if (!is_same (octal_to_hex("12"), ("A"))) {
 		printf ("oct -> hex test 5 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 5 passed\n");
 	}
 
-	if (!is_same (octal_to_hex("25"), "15")) {
+	if (!is_same (octal_to_hex("25"), ("15"))){
 		printf ("oct -> hex test 6 failed\n");
 		exit (1);
-	}
-	else {
+	}	else {
 		printf ("oct -> hex test 6 passed\n");
 	}
-	if (!is_same (octal_to_hex("12412"), "150A")) {
+	
+	if (!is_same (octal_to_hex("12412"), ("150A"))) {
 		printf ("oct -> hex test 6 failed\n");
 		exit (1);
+	}	else {
+		printf ("oct -> hex test 6 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("0"), ("0"))) {
+		printf("oct -> binary test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 1 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("1"), ("1"))) {
+		printf("oct -> binary test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 2 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("00"), ("0"))) {
+		printf("oct -> binary test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 3 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("01"), ("1"))) {
+		printf("oct -> binary test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 4 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("7"), ("111"))) {
+		printf("oct -> binary test 5 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 5 passed\n");
+	} 
+	
+	if(!is_same(octal_to_binary("15"), ("1101"))) {
+		printf("oct -> binary test 6 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 7 passed\n");
+	}
+	
+	if(!is_same(octal_to_binary("321"), ("11010001"))) {
+		printf("oct -> binary test 8 failed\n");
+		exit(1);
+	}	else {
+		printf("oct -> binary test 8 passsed\n");
+	}
+	
+
+	if (!is_same(input_and_decide_type("0b110") , "110")) {
+		printf("Automate type decider test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("Type deciding test 1 passed\n");
+	}
+	
+
+	if(!is_same(input_and_decide_type("0b0"),("0"))) {
+
+		printf("Automate type decide test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("Type deciding test 2 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("ob1"), ("1"))) {
+		printf("Automatic type decide test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("type deciding test 3 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("0b1111"), ("1111"))) {
+		printf("Automatic type decide test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("type deciding test 4 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("01"), ("1"))) {
+		printf("Automatic type decide test 5 failed\n");
+		exit(1);
+	}	else {
+		printf("type deciding test 5 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("07"), ("111"))) {
+		printf("Automatic type decide test 6 failed\n");
+		exit(1);
 	}
 	else {
-		printf ("oct -> hex test 6 passed\n");
+		printf("type deciding test 6 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("015"), ("1101"))) {
+		printf("Automatic type decide test 7 failed\n");
+		exit(1);
+	}	else {
+		printf("type deciding test 7 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("0x0"), ("0"))) {
+		printf("Automatic type decide test 8 failed\n");
+		exit(1);
+	}	else {
+		printf("type decide test 8 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("0x1"), ("1"))) {
+		printf("Automatic type decide test 9 failed\n");
+		exit(1);
+	}	else {
+		printf("type decide test 9 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("0x10"), ("10000"))) {
+		printf("type deciding test 10 failed\n");
+		exit(1);
+	}	else {
+		printf("type decide test 10 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("0"), ("0"))) {
+		printf("type deciding test 11 failed\n");
+		exit(1);
+	}	else {
+		printf("type decide test 11 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("1"), ("1"))) {
+		printf("type deciding test 12 failed\n");
+		exit(1);
+	}	else {
+		printf("typpe decide test 12 passed\n");
+	}
+	
+	if(!is_same(input_and_decide_type("36"), ("100100"))) {
+		printf("tye decidding test 13 failed\n");
+		exit(1);
+	}	else {
+		printf("type deciding test 13 passed\n");
+ 	}
+ 	
+	if(!is_same(binary_to_octal("0"), "0")) {
+		printf("bin -> octal test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 1 passed\n");
+	}
+	
+	if(!is_same(binary_to_octal("1"), "1")) {
+		printf("bin -> octal test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 2 passed\n");
+	}
+	
+	if(!is_same(binary_to_octal("111"), "7")) {
+		printf("bin -> octal test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 3 passed\n");
+	}
+	
+	if(!is_same(binary_to_octal("1111"), "17")) {
+		printf("bin -> octal test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 4 passed\n");
+	}
+	
+	if(!is_same(binary_to_octal("1000"), "10")) {
+		printf("bin -> octal test 5 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 5 passed\n");
+	}
+	
+	
+	if(!is_same(binary_to_octal("111111111"), "777")) {
+		printf("bin -> octal test 6 failed\n");
+		exit(1);
+	}	else {
+		printf("bin -> octal test 6 passed\n");
+	}
+	
+	if(!is_same(single_hex_to_binary('0'), "0000")) {
+		printf("single hex -> binary test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 1 passed\n");
+	}
+	
+	if(!is_same(single_hex_to_binary('1'), "0001")) {
+		printf("single hex -> binary test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 2 passed\n");
+	}
+	
+	if(!is_same(single_hex_to_binary('A'), "1010")) {
+		printf("single hex -> binary test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 3 passed\n");
+	}
+	
+	if(!is_same(single_hex_to_binary('F'), "1111")) {
+		printf("single hex -> binary test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 4 passed\n");
 	}
 
-	printf ("All tests are passed\n");
+	if(!is_same(single_hex_to_binary('9'), "1001")) {
+		printf("single hex -> binary test 5 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 5 passed\n");
+	}
+
+	if(!is_same(single_hex_to_binary('C'), "1100")) {
+		printf("single hex -> binary test 6 failed\n");
+		exit(1);
+	}	else {
+		printf("single hex -> binary test 6 passed\n");
+	}
+
+	if(!is_same(multi_hex_to_binary("0"), "0")) {
+		printf("multi hex -> binary test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("multi hex -> binary test 1 passed\n");
+	}
+
+	if(!is_same(multi_hex_to_binary("1"), "1")) {
+		printf("multi hex -> binary test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("multi hex -> binary test 2 passed\n");
+	}
+
+	if(!is_same(multi_hex_to_binary("11"), "10001")) {
+		printf("multi hex -> binary test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("multi hex -> binary test 3 passed\n");
+	}
+
+	if(!is_same(multi_hex_to_binary("F1"), "11110001")) {
+		printf("multi hex -> binary test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("multi hex -> binary test 4 passed\n");
+	}
+
+	if(!is_same(multi_hex_to_binary("AF"), "10101111")) {
+		printf("multi hex -> binary test 5 failed\n");
+		exit(1);
+	}	else {
+		printf("multi hex -> binary test 5 passed\n");
+	}
+	if(!is_same(binary_to_hex("0"), "0")) {
+		printf("binary to hex test 1 failed\n");
+		exit(1);
+	}
+	else {
+		printf("binary to hex test 1 passed\n");
+	}
+	if(!is_same(binary_to_hex("1"), "1")) {
+		printf("binary to hex test 2 failed\n");
+		exit(1);
+
+	}
+	else {
+		printf("binary to hex test 2 passed\n");
+	}
+	if(!is_same(binary_to_hex("111111111111"), "FFF")) {
+		printf("binary to hex test 3 failed\n");
+		exit(1);
+	}
+	else {
+		printf("binary to hex test 3 passed\n");
+	}
+	if(!is_same(binary_to_hex("1100101"), "65")) {
+		printf("binary to hex test 4 failed\n");
+		exit(1);
+	}
+	else {
+		printf("bianry to hex test 4 passed\n");
+	}
+	if(!is_same(binary_to_hex("000000000000"), "0")) {
+		printf("binary to hex test 5 failed\n");
+		exit(1);
+
+	}
+	else {
+		printf("binary to hex test 5 passed\n");
+	}
+
+	printf("All test cases are passed\n");
 }
 
 char* multi_hex_to_binary (char *input_value) {
@@ -768,14 +1223,8 @@ char* multi_hex_to_binary (char *input_value) {
 	int notthan0 = 0;
 	for (int i = 0; i < len; i++) {
 		int k = 0;
-		if (input_value[i] != '0') {
-			notthan0 = 1;
-		}
 		if (input_value[i] == '0' && i == 0) {
 			result[i] = '0';
-		}
-		if (notthan0 == 0 && input_value[i] == '0') {
-			continue;
 		}
 		char *arr = single_hex_to_binary (input_value[i]);
 		while (k < 4) {
@@ -785,7 +1234,11 @@ char* multi_hex_to_binary (char *input_value) {
 		}
 
 	}
-	return result;
+	int i = 0;
+	while (result[i] == '0' && result[i+1] != '\0') {
+		i++;
+	}
+	return result+i;
 }
 
 char* single_hex_to_binary (char input) {
@@ -817,5 +1270,6 @@ char* single_hex_to_binary (char input) {
 		temp /= 2;
 		i--;
 	}
+
 	return dummy;
 }
