@@ -695,8 +695,6 @@ void test () {
 		printf ("Hex -> octal test 4 passed\n");
 	}
 
-
-
 	if (!is_same (hex_to_octal("D"), "15")) {
 		printf ("Hex -> octal test 5 failed\n");
 		exit (1);
@@ -758,12 +756,8 @@ void test () {
 		printf ("oct -> hex test 6 passed\n");
 	}
 
-
-
-
 	printf ("All tests are passed\n");
 }
-
 
 char* multi_hex_to_binary (char *input_value) {
 	
