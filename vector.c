@@ -129,12 +129,12 @@ void self_reverse(vectar *vec) {
 vectar clone(vectar *vec) {
 
 	if((vec -> length) == 0) {
-		return create_vectar();
+		return create_vectar_with_size(vec -> size);
 	}
 	vectar cloned_vec = create_vectar_with_size(vec -> size);
 	cloned_vec.length = vec -> length;
 	cloned_vec.size   = vec -> size;
-	int i = vec -> length - 1;
+	int i             = vec -> length - 1;
 	while(i >= 0) {
 		cloned_vec.data[i] = vec -> data[i];
 		i--;
@@ -298,9 +298,89 @@ void test() {
 		printf("compare test 2 passed\n");
 	}
 
+	vectar cloned_vec = clone(&vec);
+	if(compare(&vec, &cloned_vec) != 1) {
+		printf("clone test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("clone test 1 passed\n");
+	}
 
-	
+	clear(&vec2);
+	cloned_vec = clone(&vec2);
+	if(compare(&vec, &cloned_vec) != 0) {
+		printf("clone test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("clone test 2 passed\n");
+	}
+
+	cloned_vec = reverse(&cloned_vec);
+	self_reverse(&cloned_vec);
+	if(compare(&vec, &cloned_vec) != 0) {
+		printf("reverse & self reverse test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("reverse & self reverse test 1 passed\n");
+	}
+
+	insert_at(&vec, 0, 0);
+	if(vec.data[0] != 0) {
+		printf("insert test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("insert test 1 passed\n");
+	}
+	insert_at(&vec, 2, 2);
+	if(vec.data[2] != 2) {
+		printf("insert test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("insert test 2 passed\n");
+	}
+	insert_at(&vec, 1, 1);
+	if(vec.data[1] != 1) {
+		printf("insert test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("insert test 3 passed\n");
+	}
+	insert_at(&vec, 0, 110);
+	if(vec.data[0] != 110) {
+		printf("insert test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("insert test 4 passed\n");
+	}
+
+	remove_at(&vec, 0);
+	if(vec.data[0] == 110) {
+		printf("remove test 1 failed\n");
+		exit(1);
+	}	else {
+		printf("remove test 1 passed\n");
+	}
+	remove_at(&vec, 0);
+	if(vec.data[0] == 0) {
+		printf("remove test 2 failed\n");
+		exit(1);
+	}	else {
+		printf("remove test 2 passed\n");
+	}
+	remove_at(&vec, 0);
+	if(vec.data[0] == 1) {
+		printf("remove test 3 failed\n");
+		exit(1);
+	}	else {
+		printf("remove test 3 passed\n");
+	}
+	remove_at(&vec, 0);
+	if(vec.data[0] == 0) {
+		printf("remove test 4 failed\n");
+		exit(1);
+	}	else {
+		printf("remove test 4 passed\n");
+	}
 
 	return;
-
 }
