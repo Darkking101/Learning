@@ -2,7 +2,6 @@
 #define VECTOR_H
 
 typedef struct {
-
 	int *data;
 	int length;
 	int size;
