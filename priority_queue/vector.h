@@ -2,13 +2,11 @@
 #define VECTOR_H
 
 typedef struct {
-
 	int data;
 	int priority;
 } queue;
 
 typedef struct {
-
 	queue *que;
 	int length;
 	int size;
